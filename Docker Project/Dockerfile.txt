@@ -1,0 +1,45 @@
+# Use a minimal base image
+FROM ubuntu:latest
+
+# Set environment variables
+ENV VALHALLA_HOME /opt/valhalla
+ENV VALHALLA_CONFIG $VALHALLA_HOME/config
+
+# Install required dependencies
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        build-essential \
+        cmake \
+        git \
+        libboost-all-dev \
+        libcurl4-openssl-dev \
+        libgeos-dev \
+        liblua5.2-dev \
+        libprime-server-dev \
+        libprotobuf-dev \
+        libspatialite-dev \
+        protobuf-compiler && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Clone Valhalla repository, build, and install
+RUN git clone --depth=1 https://github.com/valhalla/valhalla.git $VALHALLA_HOME && \
+    cd $VALHALLA_HOME && \
+    mkdir build && \
+    cd build && \
+    cmake .. && \
+    make -j$(nproc) && \
+    make install && \
+    rm -rf $VALHALLA_HOME
+
+# Set up Valhalla configuration directory
+RUN mkdir -p $VALHALLA_CONFIG
+
+# Expose Valhalla server port
+EXPOSE 8002
+
+# Define working directory
+WORKDIR $VALHALLA_HOME
+
+# Set the command to run Valhalla server with default config
+CMD ["valhalla_service", "-c", "/opt/valhalla/config/valhalla.json"]
