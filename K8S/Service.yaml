@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: valhalla-service
+spec:
+  selector:
+    app: valhalla
+  ports:
+    - protocol: TCP
+      port: 8002
+      targetPort: 8002
+  type: LoadBalancer  # Change as per your networking setup

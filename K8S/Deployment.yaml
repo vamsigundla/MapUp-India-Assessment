@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: valhalla-deployment
+spec:
+  replicas: 3  # Adjust replicas as needed for scalability
+  selector:
+    matchLabels:
+      app: valhalla
+  template:
+    metadata:
+      labels:
+        app: valhalla
+    spec:
+      containers:
+      - name: valhalla-server
+        image: your-docker-registry/valhalla-server:latest  # Replace with your image
+        ports:
+        - containerPort: 8002
